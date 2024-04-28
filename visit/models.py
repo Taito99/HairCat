@@ -1,14 +1,15 @@
 from django.db import models
+from django.conf import settings
 from pets.models import Pets
-from users.models import CustomUser
 
 
-# Create your models here.
 class Visit(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='visits')
     pet = models.ForeignKey(Pets, on_delete=models.CASCADE, related_name='visits')
-    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='visits')
-    date = models.DateField()
-    description = models.TextField(blank=True)
+    date = models.DateTimeField()
+    status = models.CharField(max_length=10, choices=(('planned', 'Planned'), ('cancelled', 'Cancelled')),
+                              default='planned')
+    notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.date} - {self.pet.name} - {self.owner.username}"
+        return f"Visit for {self.user.username} on {self.date}"
