@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from Backend.pets.models import Pets
+from pets.models import Pets
 
 
 class Visit(models.Model):
