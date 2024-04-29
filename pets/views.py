@@ -27,13 +27,14 @@ def create_pet(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def pet_detail(request, pk):
-    if request.method == 'GET':
-        pet = get_object_or_404(Pets, pk=pk)
-        if request.user.pets.filter(pk=pet.pk).exists():
-            serializer = PetsSerializer(pet)
-            return Response(serializer.data)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    pet = get_object_or_404(Pets, pk=pk)
+
+    if pet.owner == request.user or request.user.pets.filter(pk=pet.pk).exists():
+        serializer = PetsSerializer(pet)
+        return Response(serializer.data)
+    else:
+        return Response({"detail": "You do not have permission to view this pet."},
+                        status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(['GET'])
