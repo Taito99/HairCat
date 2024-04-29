@@ -9,8 +9,14 @@ from .serializers import PetsSerializer
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_pet_list(request):
-    if request.method == 'POST':
+def create_pet(request):
+    if isinstance(request.data, list):
+        serializer = PetsSerializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
         serializer = PetsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -32,10 +38,14 @@ def pet_detail(request, pk):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_pet_list(request):
-    pets = request.user.pets.all()
-    serializer = PetsSerializer(pets, many=True)
-    return Response(serializer.data)
+def get_pet(request, pk):
+    if request.method == 'GET':
+        pet = get_object_or_404(Pets, pk=pk)
+        if pet.owner != request.user:
+            return Response({"detail": "You do not have permission to view this pet."},
+                            status=status.HTTP_403_FORBIDDEN)
+        serializer = PetsSerializer(pet)
+        return Response(serializer.data)
 
 
 @api_view(['PUT'])
