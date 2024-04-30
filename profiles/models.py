@@ -1,13 +1,13 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from users.models import CustomUser
 
-User = get_user_model()
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100, blank=True, verbose_name="First Name")
     last_name = models.CharField(max_length=100, blank=True, verbose_name="Last Name")
-    pets = models.ManyToManyField('pets.Pets', related_name='owners', blank=True, verbose_name="Owned Pets")
+    pets = models.ManyToManyField('pets.Pets', related_name='owners_profile')  # Zmiana related_name
+
 
     def __str__(self):
         return f"Profile of {self.user.username}"
