@@ -34,9 +34,10 @@ INSTALLED_APPS = [
     'pets',
     'visit',
     'profiles',
+    'review',
 
     # THIRD PARTY
-    'rest_framework',
+    'rest_framework',  # Poprawna nazwa modułu
     'rest_framework.authtoken',
 
     'django.contrib.admin',

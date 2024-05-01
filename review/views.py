@@ -1,18 +1,11 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
-from .models import Review
-from .serializers import ReviewSerializer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-class ReviewCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+from review.models import Review
+from review.serializers import ReviewSerializer
 
-    def post(self, request):
-        serializer = ReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
 
 class ReviewLikeDislikeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -31,6 +24,9 @@ class ReviewLikeDislikeView(APIView):
             review.dislikes += 1
         else:
             return Response({"message": "Invalid action."}, status=400)
+
+        if request.user != review.user:  # Sprawdź, czy użytkownik jest autorem recenzji
+            raise PermissionDenied("You are not allowed to like/dislike this review.")
 
         review.save()
         serializer = ReviewSerializer(review)
