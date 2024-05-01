@@ -1,3 +1,4 @@
+from django.contrib.auth.views import PasswordResetView
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
@@ -49,3 +50,19 @@ def logout(request):
             return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class CustomPasswordResetView(PasswordResetView):
+    def form_valid(self, form):
+        """
+        If the form is valid, send a reset link to the user.
+        """
+        opts = {
+            'use_https': self.request.is_secure(),
+            'email_template_name': 'registration/password_reset_email.html',
+            'subject_template_name': 'registration/password_reset_subject.txt',
+            'request': self.request,
+        }
+        form.save(**opts)
+
+        # Here, you can send additional response if needed
+        return Response({"message": "Password reset email has been sent."}, status=status.HTTP_200_OK)
