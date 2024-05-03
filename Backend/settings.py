@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'visit',
     'profiles',
     'review',
+    'chat',
 
 
     # THIRD PARTY
