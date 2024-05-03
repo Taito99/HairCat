@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'profiles',
     'review',
 
+
     # THIRD PARTY
     'rest_framework',  # Poprawna nazwa modułu
     'rest_framework.authtoken',
