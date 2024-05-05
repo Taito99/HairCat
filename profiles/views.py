@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Profile
 
+
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -13,6 +14,7 @@ class UserProfileView(APIView):
         user_profile = Profile.objects.get(user=request.user)
         serializer = ProfileSerializer(user_profile)
         return Response(serializer.data)
+
 
 @login_required
 def user_profile(request):

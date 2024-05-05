@@ -55,8 +55,8 @@ def chat_with_contact(request, receiver_id):
         elif message.receiver != request.user and message.receiver not in last_contacts:
             last_contacts.append(message.receiver)
 
-    # Wyświetlaj nazwę użytkownika/administratora, który wysłał ostatnią wiadomość, aby użytkownik mógł szybko zidentyfikować
-    # Ostatnia wiadomość będzie wiadomością z najnowszym znacznikiem czasu
+    # Wyświetlaj nazwę użytkownika/administratora, który wysłał ostatnią wiadomość, aby użytkownik mógł szybko
+    # zidentyfikować Ostatnia wiadomość będzie wiadomością z najnowszym znacznikiem czasu
     last_message = messages[-1] if messages else None
     last_sender = last_message.sender if last_message else None
 

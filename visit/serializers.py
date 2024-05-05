@@ -5,10 +5,14 @@ from .models import Visit
 class VisitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Visit
-        fields = ['id', 'user', 'pet', 'date', 'status', 'notes']
+        fields = ['id', 'pet', 'date', 'status', 'notes']
+        extra_kwargs = {
+            'user': {'read_only': True},
+        }
 
     def create(self, validated_data):
-        return Visit.objects.create(**validated_data)
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
 
     def update(self, instance, validated_data):
         instance.date = validated_data.get('date', instance.date)

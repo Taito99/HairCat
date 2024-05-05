@@ -68,3 +68,11 @@ def delete_pet(request, pk):
         pet = get_object_or_404(Pets, pk=pk)
         pet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_pets(request):
+    pets = Pets.objects.all()
+    serializer = PetsSerializer(pets, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

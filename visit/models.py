@@ -8,7 +8,7 @@ class Visit(models.Model):
     pet = models.ForeignKey(Pets, on_delete=models.CASCADE, related_name='visits')
     date = models.DateTimeField()
     status = models.CharField(max_length=10, choices=(('planned', 'Planned'), ('cancelled', 'Cancelled')),
-                              default='planned')
+                                  default='planned')
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):

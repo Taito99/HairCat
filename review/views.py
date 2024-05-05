@@ -1,10 +1,10 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from review.models import Review
-from review.serializers import ReviewSerializer
+from .models import Review
+from .serializers import ReviewSerializer
 
 
 class ReviewLikeDislikeView(APIView):
@@ -32,13 +32,17 @@ class ReviewLikeDislikeView(APIView):
         serializer = ReviewSerializer(review)
         return Response(serializer.data)
 
+
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_all_reviews():
     review = Review.objects.all()
     serializer = ReviewSerializer(review, many=True)
     return Response(serializer.data)
 
+
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def addReview(request):
     serializer = ReviewSerializer(data=request.data)
     if serializer.is_valid():
@@ -46,7 +50,9 @@ def addReview(request):
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
+
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def updateReview(request, review_id):
     try:
         review = Review.objects.get(id=review_id)
@@ -62,7 +68,9 @@ def updateReview(request, review_id):
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
 
+
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deleteReview(request, review_id):
     try:
         review = Review.objects.get(id=review_id)

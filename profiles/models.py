@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import CustomUser
 
+
 class Profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100, blank=True, verbose_name="First Name")
