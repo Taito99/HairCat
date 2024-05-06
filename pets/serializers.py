@@ -3,9 +3,12 @@ from .models import Pets
 
 
 class PetsSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(max_length=None, allow_empty_file=True, allow_null=True, required=False)
+
     class Meta:
         model = Pets
-        fields = ['id', 'name', 'breed', 'age']
+        fields = ['id', 'name', 'breed', 'age', 'profile_picture']
+
 
     def create(self, validated_data):
         return Pets.objects.create(**validated_data)

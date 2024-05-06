@@ -3,9 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Pets
+from .models import Pets, UserPet
 from .serializers import PetsSerializer
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -68,3 +67,24 @@ def delete_pet(request, pk):
         pet = get_object_or_404(Pets, pk=pk)
         pet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_pet_to_profile(request):
+    if request.method == 'POST':
+        user = request.user
+        pet_id = request.data.get('pet_id')  # Id zwierzęcia, które użytkownik chce dodać
+
+        # Sprawdzenie, czy podane zwierzę istnieje
+        try:
+            pet = Pets.objects.get(id=pet_id)
+        except Pets.DoesNotExist:
+            return Response({"detail": "Podane zwierzę nie istnieje."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Sprawdzenie, czy użytkownik już nie posiada tego zwierzęcia w swoim profilu
+        if UserPet.objects.filter(user=user, pet=pet).exists():
+            return Response({"detail": "To zwierzę jest już przypisane do twojego profilu."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Tworzenie powiązania między użytkownikiem a zwierzęciem
+        UserPet.objects.create(user=user, pet=pet)
+        return Response({"detail": "Zwierzę zostało dodane do twojego profilu."}, status=status.HTTP_201_CREATED)
