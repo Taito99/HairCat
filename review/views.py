@@ -1,5 +1,7 @@
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -44,41 +46,36 @@ def get_all_reviews():
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def addReview(request):
-    serializer = ReviewSerializer(data=request.data)
+    serializer = ReviewSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
-        serializer.save(user=request.user)
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateReview(request, review_id):
-    try:
-        review = Review.objects.get(id=review_id)
-    except Review.DoesNotExist:
-        return Response({"message": "Review does not exist."}, status=404)
+    review = get_object_or_404(Review, pk=review_id)
+    if review.user != request.user:
+        return Response({"detail": "You do not have permission to update this review."},
+                        status=status.HTTP_403_FORBIDDEN)
 
-    if request.user != review.user:
-        raise PermissionDenied("You are not allowed to update this review.")
-
-    serializer = ReviewSerializer(review, data=request.data)
+    serializer = ReviewSerializer(review, data=request.data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
-    return Response(serializer.errors, status=400)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def deleteReview(request, review_id):
-    try:
-        review = Review.objects.get(id=review_id)
-    except Review.DoesNotExist:
-        return Response({"message": "Review does not exist."}, status=404)
-
-    if request.user != review.user:
-        raise PermissionDenied("You are not allowed to delete this review.")
+    review = get_object_or_404(Review, pk=review_id)
+    if review.user != request.user:
+        return Response({"detail": "You do not have permission to delete this review."},
+                        status=status.HTTP_403_FORBIDDEN)
 
     review.delete()
-    return Response({"message": "Review deleted successfully."}, status=204)
+    return Response({"message": "Review deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
