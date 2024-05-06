@@ -1,5 +1,6 @@
+
+from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
 
 
 class Pets(models.Model):
@@ -14,8 +15,8 @@ class Pets(models.Model):
 
 
 class UserPet(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     pet = models.ForeignKey(Pets, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.user.username}'s pet: {self.pet.name}"
+        return f"{self.user}'s pet: {self.pet.name}"
