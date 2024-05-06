@@ -29,7 +29,7 @@ def create_pet(request):
 def pet_detail(request, pk):
     pet = get_object_or_404(Pets, pk=pk)
 
-    if pet.owner == request.user or request.user.pets.filter(pk=pet.pk).exists():
+    if request.user.pets.filter(pk=pet.pk).exists():
         serializer = PetsSerializer(pet)
         return Response(serializer.data)
     else:
@@ -73,6 +73,6 @@ def delete_pet(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_pets(request):
-    pets = Pets.objects.all()
+    pets = request.user.pets.all()
     serializer = PetsSerializer(pets, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
