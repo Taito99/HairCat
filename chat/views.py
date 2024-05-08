@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 from .models import Message
 from users.models import CustomUser  # Załóżmy, że CustomUser to model użytkownika w Twojej aplikacji
+from .serializers import ChatSerializer
 
 
+@api_view(['POST'])
 @login_required
 def chat_room(request):
     if request.method == 'POST':
@@ -66,3 +72,18 @@ def chat_with_contact(request, receiver_id):
     return render(request, 'chat/chat_with_contact.html',
                   {'receiver': receiver, 'messages': messages, 'last_sender': last_sender,
                    'unread_messages': unread_messages})
+
+
+@api_view(['POST'])
+@login_required
+def create_chat(request):
+    serializer = ChatSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid():
+        chat = serializer.save()
+        return Response(ChatSerializer(chat).data, status=status.HTTP_201_CREATED)  # Serialize chat instance to include updated participants
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
