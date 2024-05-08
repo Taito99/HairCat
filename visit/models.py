@@ -11,5 +11,6 @@ class Visit(models.Model):
                                   default='planned')
     notes = models.TextField(blank=True, null=True)
 
+
     def __str__(self):
         return f"Visit for {self.user.username} on {self.date}"
