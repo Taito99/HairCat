@@ -37,11 +37,12 @@ class ReviewLikeDislikeView(APIView):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_reviews():
-    review = Review.objects.all()
-    serializer = ReviewSerializer(review, many=True)
+def get_all_reviews(request):
+    # Użyj `request.user.review_set.all()` lub `Review.objects.filter(user=request.user)`
+    # w zależności od tego, jak zdefiniowano relację w modelu Review
+    reviews = Review.objects.filter(user=request.user)  # Zakładam, że istnieje pole 'user' w modelu Review
+    serializer = ReviewSerializer(reviews, many=True)
     return Response(serializer.data)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -78,4 +79,3 @@ def deleteReview(request, review_id):
 
     review.delete()
     return Response({"message": "Review deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-
