@@ -42,9 +42,17 @@ class ChatListSerializer(serializers.ModelSerializer):
     )
 
 class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'content', 'timestamp', 'is_read']
+        fields = ['id', 'sender', 'content', 'timestamp', 'is_read', 'chat']
+        read_only_fields = ['timestamp', 'chat']
 
     def create(self, validated_data):
-        return Message.objects.create(**validated_data)
+        # Retrieve the authenticated user and chat from the request context
+        user = self.context['request'].user
+        chat = self.context['chat']  # The chat instance needs to be passed in the context
+        # Create the message instance with the sender and chat assigned
+        message = Message.objects.create(sender=user, chat=chat, **validated_data)
+        return message

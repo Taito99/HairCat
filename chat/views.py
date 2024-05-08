@@ -34,21 +34,17 @@ def user_chats_list(request):
 @api_view(['GET', 'POST'])
 @login_required
 def chat_messages(request, chat_id):
-    # Retrieve the chat object, ensuring it exists.
     chat = get_object_or_404(Chat, id=chat_id)
 
     if request.method == 'GET':
-        # Retrieve all messages from the chat
         messages = Message.objects.filter(chat=chat)
         serializer = MessageSerializer(messages, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        # Create a new message in the chat
-        serializer = MessageSerializer(data=request.data)
+        serializer = MessageSerializer(data=request.data, context={'request': request, 'chat': chat})
         if serializer.is_valid():
-            # Set the sender to the current user and the chat to the retrieved chat
-            serializer.save(sender=request.user, chat=chat)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
