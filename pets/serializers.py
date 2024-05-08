@@ -5,7 +5,7 @@ from .models import Pets
 class PetsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pets
-        fields = ['id', 'name', 'breed', 'age', 'owners']
+        fields = ['id', 'name', 'breed', 'age', 'image', 'owners']
         extra_kwargs = {'owners': {'read_only': True}}  # Ustaw 'owners' jako pole tylko do odczytu
 
     def create(self, validated_data):
@@ -21,6 +21,8 @@ class PetsSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.breed = validated_data.get('breed', instance.breed)
         instance.age = validated_data.get('age', instance.age)
+        if 'image' in validated_data:
+            instance.image = validated_data['image']
         instance.save()
         # Możesz również zaktualizować właścicieli, jeśli jest to wymagane
         return instance

@@ -51,6 +51,7 @@ def logout(request):
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 class CustomPasswordResetView(PasswordResetView):
     def form_valid(self, form):
         """
