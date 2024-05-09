@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.conf import settings
 
@@ -12,7 +14,12 @@ class Message(models.Model):
         return f'Message from {self.sender} to {self.receiver}'
 
 class Chat(models.Model):
-    participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='chats')
+    participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='chats', blank=True)
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False)
 
     def __str__(self):
         return f'Chat between {", ".join(str(participant) for participant in self.participants.all())}'
+

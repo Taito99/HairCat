@@ -9,6 +9,7 @@ class CustomUser(AbstractUser):
     city = models.CharField(max_length=255, null=True, blank=True, verbose_name="City")
     phone_number = models.CharField(max_length=9, null=False, blank=False, verbose_name="Phone")
     pets = models.ManyToManyField(Pets, related_name='owners')
+    is_staff = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
