@@ -61,3 +61,5 @@ def delete_pet(request, pk):
                         status=status.HTTP_403_FORBIDDEN)
     pet.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+

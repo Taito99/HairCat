@@ -13,6 +13,7 @@ from .serializers import UserSerializer
 @api_view(['POST'])
 def register(request):
     if request.method == 'POST':
+        print(request.data)
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -67,3 +68,12 @@ class CustomPasswordResetView(PasswordResetView):
 
         # Here, you can send additional response if needed
         return Response({"message": "Password reset email has been sent."}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_stuff_list(request):
+    # Filtrujemy użytkowników, którzy mają is_stuff=True
+    users = CustomUser.objects.filter(is_staff=True)
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)

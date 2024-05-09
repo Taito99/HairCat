@@ -5,7 +5,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Message, Chat
-from users.models import CustomUser  # Załóżmy, że CustomUser to model użytkownika w Twojej aplikacji
 from .serializers import ChatSerializer, ChatListSerializer, MessageSerializer
 
 
@@ -15,9 +14,11 @@ def create_chat(request):
     serializer = ChatSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         chat = serializer.save()
-        return Response(ChatSerializer(chat).data, status=status.HTTP_201_CREATED)  # Serialize chat instance to include updated participants
+        return Response(ChatSerializer(chat).data,
+                        status=status.HTTP_201_CREATED)  # Serialize chat instance to include updated participants
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 @login_required
@@ -30,6 +31,7 @@ def user_chats_list(request):
     serializer = ChatListSerializer(chats, many=True)
     # Return the data
     return Response(serializer.data)
+
 
 @api_view(['GET', 'POST'])
 @login_required
