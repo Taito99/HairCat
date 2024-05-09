@@ -3,7 +3,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from users.models import CustomUser
-from .models import Chat  # Make sure to import the Chat model correctly
+from .models import Chat, Message  # Make sure to import the Chat model correctly
 
 
 class ChatSerializer(serializers.ModelSerializer):
@@ -28,3 +28,31 @@ class ChatSerializer(serializers.ModelSerializer):
             chat.save()
 
         return chat
+
+
+class ChatListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = ['id', 'participants']  # You can include additional fields if needed
+
+    participants = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='username'  # Assuming 'username' is the field you want to display
+    )
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'content', 'timestamp', 'is_read', 'chat']
+        read_only_fields = ['timestamp', 'chat']
+
+    def create(self, validated_data):
+        # Retrieve the authenticated user and chat from the request context
+        user = self.context['request'].user
+        chat = self.context['chat']  # The chat instance needs to be passed in the context
+        # Create the message instance with the sender and chat assigned
+        message = Message.objects.create(sender=user, chat=chat, **validated_data)
+        return message
